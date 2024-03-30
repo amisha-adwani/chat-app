@@ -20,7 +20,9 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-
+app.get("/", (req, res) => {
+  res.send("Server is up and running");
+});
 app.use("/auth", authRouter);
 app.use("/room", router);
 
@@ -104,9 +106,6 @@ io.on("connection", (socket) => {
       socket.emit("error", "couldnt perform requested action");
     }
   });
-});
-app.get("/", (req, res) => {
-  req.send("Server is up and running");
 });
 
 const port = process.env.PORT || 3001;
