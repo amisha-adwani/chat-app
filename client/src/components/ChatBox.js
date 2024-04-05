@@ -8,6 +8,7 @@ import { Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SendIcon from '@mui/icons-material/Send';
 import Details from "./Avatar";
+import Board from "./Board";
 const ChatBox = ({ userNotification }) => {
   const context = useContext(ChatContext);
   const {
@@ -18,7 +19,6 @@ const ChatBox = ({ userNotification }) => {
     socket,
     username,
     senderId,
-    fetchRooms
   } = context;
   const { roomId } = useParams();
   useEffect(() => {
@@ -81,7 +81,7 @@ const ChatBox = ({ userNotification }) => {
             ))}
           </Typography>
         )}
-
+<Board/>
         <Typography component="div">
           {messageReceived.map((msg, index) => (
             <Box
