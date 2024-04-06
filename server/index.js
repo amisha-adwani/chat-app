@@ -31,6 +31,12 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("receive_message", { message, senderId, username });
   });
 
+  socket.on('drawing',(data)=>{
+    socket.broadcast.emit('onDrawing', (data))
+  })
+  socket.on('endDrawing',(data)=>{
+    socket.broadcast.emit('endDrawing', (data))
+  })
   socket.on("create-room", async ({ newRoomId, senderId, username }) => {
     try {
       const userId = new ObjectId(senderId);

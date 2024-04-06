@@ -1,7 +1,29 @@
-import React, { useState, useEffect, useRef } from "react";
-
+import React, { useState, useEffect, useRef, useContext } from "react";
+import ChatContext from "../context/ChatContext";
 const Board = () => {
+  const context = useContext(ChatContext);
+  const {
+    socket
+  } = context;
   const canvasRef = useRef(null);
+
+
+  useEffect(()=>{
+ if(socket){
+  socket.on('canvasImage', (data) =>{
+    const image = new Image()
+    image.src = data;
+
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    image.onload = () =>{
+      ctx.drawImage(image,0,0)
+    }
+  })
+ }
+  },[socket])
+
+
   //drawing state variables
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastX, setLastX] = useState(0);
@@ -10,12 +32,17 @@ const Board = () => {
   useEffect(() => {      
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+
+    //function to start drawing
     const startDrawing = (e) => {
       setIsDrawing(true);
+      const x = e.offsetX;
+      const y = e.offsetY;
       console.log("x", e.offsetX);
       console.log("y", e.offsetY);
-      setLastX(e.offsetX);
-      setLastY(e.offsetY);
+      setLastX(x);
+      setLastY(y);
+      socket.emit('drawing',{x, y})
     };
 
     //function to draw
@@ -23,23 +50,32 @@ const Board = () => {
       if (!isDrawing) return;
       if (ctx) {
         console.log("drawing");
+        const x = e.offsetX;
+        const y = e.offsetY;
         ctx.strokeStyle = "black";
         ctx.lineWidth = 5;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(e.offsetX, e.offsetY);
         ctx.stroke();
-        setLastX(e.offsetX);
-        setLastY(e.offsetY);
+        setLastX(x);
+        setLastY(y);
+        socket.emit('drawing',{x, y} )
       }
     };
 
     // end drawing
-    const endDrawing = () => {
+    const endDrawing = (e) => {
+      const x = e.offsetX;
+      const y = e.offsetY;
+      socket.emit('endDrawing', (x, y))
       setIsDrawing(false);
     };
+ 
+    socket.on('onDrawing',(data)=>{
+      ctx.lineTo(data.x, data.y)
+      ctx.stroke()
+    })
     
     // Event listeners for drawing
     if (canvas) {
