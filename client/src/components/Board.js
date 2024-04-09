@@ -26,14 +26,12 @@ const Board = () => {
       const y = e.offsetY;
       setLastX(x);
       setLastY(y);
-      socket.emit('drawing',{x, y,color: currentColor})
     };
 
     //function to draw
     const draw = (e) => {
       if (!isDrawing) return;
       if (ctx) {
-        console.log("drawing");
         const x = e.offsetX;
         const y = e.offsetY;
         ctx.lineWidth = 2;
@@ -44,7 +42,7 @@ const Board = () => {
         ctx.stroke();
         setLastX(x);
         setLastY(y);
-        socket.emit('drawing',{x, y,color: currentColor } )
+        socket.emit('drawing',{x: lastX, y: lastY,color: currentColor } )
       }
     };
 
@@ -59,7 +57,6 @@ const Board = () => {
     };
  
     socket.on('onDrawing', (data) => {
-      console.log(data.color)
       setCurrentColor(data.color); 
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
@@ -69,11 +66,9 @@ const Board = () => {
     });
     
     socket.on('onEndDrawing',(data)=>{
-      setCurrentColor(data.color); 
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
-      //bug(1) come back later
-      ctx.moveTo(data.x, data.y)
+      ctx.beginPath();
     })
     
     // Event listeners for drawing
