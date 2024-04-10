@@ -14,6 +14,11 @@ const Board = () => {
   const [lastX, setLastX] = useState(0);
   const [lastY, setLastY] = useState(0);
   const [currentColor, setCurrentColor] = useState('yellow');
+  const [mode, setMode] = useState('pen');
+
+  const eraserClick= ()=>{
+    setMode('eraser')
+  }
 
   useEffect(() => {      
     const canvas = canvasRef.current;
@@ -36,10 +41,19 @@ const Board = () => {
         const y = e.offsetY;
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.strokeStyle = currentColor;
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
+        if(mode === 'pen'){
+          ctx.globalCompositeOperation="source-over";
+          ctx.strokeStyle = currentColor;
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(e.offsetX, e.offsetY);
+          ctx.stroke();
+        }
+        else{
+          //eraser
+          ctx.globalCompositeOperation="destination-out";
+          ctx.arc(lastX,lastY,8,0,Math.PI*2);
+          ctx.fill();
+        }
         setLastX(x);
         setLastY(y);
         socket.emit('drawing',{x: lastX, y: lastY,color: currentColor } )
@@ -86,9 +100,11 @@ const Board = () => {
         canvas.removeEventListener("mouseup", endDrawing);
       }
     };
+    // eslint-disable-next-line
   }, [socket,isDrawing, lastX]);
 
   const handleColorChange =(color)=>{
+    setMode('pen')
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     setCurrentColor(color)
@@ -96,15 +112,27 @@ const Board = () => {
 
    }
 
+   const clearClick=()=>{
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+   }
+
   return (
     <div>
-      <Box sx={{display:'flex'}}>
+      <Box sx={{ display:'flex',justifyContent:'space-between', width:600}}>
+        <Box  sx={{display:'flex'}}>
     <Box sx={{height:30, width: 30, bgcolor:'black', cursor:'pointer'}} onClick={() => handleColorChange("black")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'red', cursor:'pointer'}} onClick={() => handleColorChange("red")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'green', cursor:'pointer'}} onClick={() => handleColorChange("green")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'blue', cursor:'pointer'}} onClick={() => handleColorChange("blue")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'yellow', cursor:'pointer'}} onClick={() => handleColorChange("yellow")}> </Box>
-
+    </Box>
+    <Box sx={{display:'flex'}}>
+  <Box sx={{mr:2, cursor:'pointer'}} onClick={eraserClick}>Erase</Box>
+  <Box sx={{mr:2, cursor:'pointer'}} onClick={clearClick}>Clear</Box>
+  <Box>X</Box>
+</Box>
       </Box>
       <canvas
         ref={canvasRef}

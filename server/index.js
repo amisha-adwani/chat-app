@@ -34,8 +34,8 @@ io.on("connection", (socket) => {
   socket.on('drawing',(data)=>{
     socket.broadcast.emit('onDrawing', {x : data.x, y: data.y, color: data.color})
   })
-  socket.on('endDrawing', (data)=>{
-   socket.broadcast.emit('onEndDrawing', {x : data.x, y: data.y})
+  socket.on('endDrawing', ()=>{
+   socket.broadcast.emit('onEndDrawing')
   })
   socket.on("create-room", async ({ newRoomId, senderId, username }) => {
     try {
