@@ -4,13 +4,13 @@ Real-time text-based chat app using MongoDB, Express.js, React.js, Node.js, Sock
 
 ## Features
 
-[x] Real-time messaging <br />
-[x] User authentication <br />
-[x] Group chat <br />
-[ ] Private chat <br />
-[ ] Emoji Support <br />
-[ ] Integrate canvas <br />
-[ ] Customize user profile <br />
+- [x] Real-time messaging <br />
+- [x] User authentication <br />
+- [x] Group chat <br />
+- [ ] Private chat <br />
+- [ ] Emoji Support <br />
+- [ ] Integrate canvas <br />
+- [ ] Customize user profile <br />
 
 ## Installation
 
