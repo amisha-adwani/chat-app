@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import ChatContext from "../context/ChatContext";
 import Box from "@mui/material/Box";
-
+import ContentPasteOffIcon from '@mui/icons-material/ContentPasteOff';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const Board = () => {
   const context = useContext(ChatContext);
@@ -56,7 +60,7 @@ const Board = () => {
         }
         setLastX(x);
         setLastY(y);
-        socket.emit('drawing',{x: lastX, y: lastY,color: currentColor } )
+        socket.emit('drawing',{x: lastX, y: lastY,color: currentColor, mode } )
       }
     };
 
@@ -71,13 +75,21 @@ const Board = () => {
     };
  
     socket.on('onDrawing', (data) => {
-      setCurrentColor(data.color); 
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
-      ctx.strokeStyle = data.color; 
-      ctx.lineTo(data.x, data.y);
-      ctx.stroke();
+      if (data.mode === 'pen') {
+        ctx.globalCompositeOperation = 'source-over';
+        setCurrentColor(data.color); 
+        ctx.strokeStyle = data.color; 
+        ctx.lineTo(data.x, data.y);
+        ctx.stroke();
+      } else if (data.mode === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.arc(data.x, data.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
     });
+    
     
     socket.on('onEndDrawing',(data)=>{
       const canvas = canvasRef.current;
@@ -112,11 +124,13 @@ const Board = () => {
 
    }
 
+
    const clearClick=()=>{
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
    }
+
 
   return (
     <div>
@@ -127,12 +141,23 @@ const Board = () => {
     <Box sx={{height:30, width: 30, bgcolor:'green', cursor:'pointer'}} onClick={() => handleColorChange("green")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'blue', cursor:'pointer'}} onClick={() => handleColorChange("blue")}> </Box>
     <Box sx={{height:30, width: 30, bgcolor:'yellow', cursor:'pointer'}} onClick={() => handleColorChange("yellow")}> </Box>
+    <Tooltip title='Erase'>
+      <IconButton  sx={{cursor: 'pointer' }} onClick={eraserClick}>
+      <CleaningServicesIcon/>
+      </IconButton>
+    </Tooltip>
+    <Tooltip title='Clear'>
+      <IconButton  sx={{cursor: 'pointer' }} onClick={clearClick}>
+      <ContentPasteOffIcon/>
+      </IconButton>
+    </Tooltip>
     </Box>
-    <Box sx={{display:'flex'}}>
-  <Box sx={{mr:2, cursor:'pointer'}} onClick={eraserClick}>Erase</Box>
-  <Box sx={{mr:2, cursor:'pointer'}} onClick={clearClick}>Clear</Box>
-  <Box>X</Box>
-</Box>
+    <Tooltip title='Close'>
+      <IconButton >
+      <CloseIcon/>
+      </IconButton>
+    </Tooltip>
+
       </Box>
       <canvas
         ref={canvasRef}

@@ -32,7 +32,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on('drawing',(data)=>{
-    socket.broadcast.emit('onDrawing', {x : data.x, y: data.y, color: data.color})
+    socket.broadcast.emit('onDrawing', {x : data.x, y: data.y, color: data.color, mode: data.mode})
   })
   socket.on('endDrawing', ()=>{
    socket.broadcast.emit('onEndDrawing')
