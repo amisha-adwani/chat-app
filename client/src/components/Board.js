@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-const Board = () => {
+const Board = ({open,handleOpen}) => {
   const context = useContext(ChatContext);
   const { socket} = context;
   const canvasRef = useRef(null);
@@ -26,8 +26,11 @@ const Board = () => {
 
   useEffect(() => {      
     const canvas = canvasRef.current;
+    if (!canvas) {
+      console.error("Canvas element not found");
+      return;
+    }
     const ctx = canvas.getContext("2d");
-
     //function to start drawing
     const startDrawing = (e) => {
       setIsDrawing(true);
@@ -133,7 +136,7 @@ const Board = () => {
 
 
   return (
-    <div>
+        <div style={{display: open ? '': 'none' }}>
       <Box sx={{ display:'flex',justifyContent:'space-between', width:600}}>
         <Box  sx={{display:'flex'}}>
     <Box sx={{height:30, width: 30, bgcolor:'black', cursor:'pointer'}} onClick={() => handleColorChange("black")}> </Box>
@@ -152,7 +155,7 @@ const Board = () => {
       </IconButton>
     </Tooltip>
     </Box>
-    <Tooltip title='Close'>
+    <Tooltip title='Close' onClick={handleOpen}>
       <IconButton >
       <CloseIcon/>
       </IconButton>
@@ -165,7 +168,7 @@ const Board = () => {
         height={400}
         style={{ backgroundColor: "white", boxShadow: "10px 10px 10px" }}
       />
-    </div>
+    </div> 
   );
 };
 
